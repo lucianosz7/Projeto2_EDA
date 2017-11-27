@@ -127,11 +127,42 @@ void avl_traverse_dfs( avl_tree_t *tree ) {
 	avl_traverse_node_dfs( tree->root, 0 );
 }
 
+int tem_nada(avl_node_t *t){
+  return t==NULL;
+}
+
+avl_node_t *motosserra(avl_node_t *no){
+  if(!tem_nada(no)){
+    motosserra(no->left);
+    motosserra(no->right);
+    free(no);
+  }
+  return NULL;
+}
+
+int encontrar_valor (avl_tree_t* no, char *palavra )
+{
+	avl_node_t * atual = no->root;
+
+	while ( atual )
+	{
+		if ( strcmp(atual->value,palavra) < 0 )
+			atual = atual->right;
+		else if(strcmp(atual->value,palavra) > 0 )
+			atual = atual->left;
+		else
+			return 1;
+	}
+
+	return 0;
+}
+
 int main( int argc, char **argv ) {
 	avl_tree_t *tree = NULL;
+	avl_node_t *no;
 
 	tree = avl_create();
-
+	int x;
 	avl_insert( tree, "abobora" );
 	avl_insert( tree, "azeite" );
 	avl_insert( tree, "dicionario" );
@@ -139,22 +170,11 @@ int main( int argc, char **argv ) {
 	avl_insert( tree, "bacia" );
 
 	avl_traverse_dfs( tree );
-
+	x = encontrar_valor(tree,"abobora");
+	int y = encontrar_valor(tree, "peixe");
+	int z = encontrar_valor(tree,"zebra");
+	printf("%d %d %d\n",x,y,z);
+	no = tree->root;
+	no = motosserra(no);
 	return 0;
 }
-/*
-node * encontrar_valor (const tree * const tree, int valor )
-{
-	node * atual = tree->raiz;
-
-	while ( atual && atual->valor != valor )
-	{
-		if ( valor > atual->valor )
-			atual = atual->dir;
-		else
-			atual = atual->esq;
-	}
-
-	return atual;
-}
-*/
