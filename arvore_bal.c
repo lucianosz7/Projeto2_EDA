@@ -142,3 +142,19 @@ int main( int argc, char **argv ) {
 
 	return 0;
 }
+/*
+node * encontrar_valor (const tree * const tree, int valor )
+{
+	node * atual = tree->raiz;
+
+	while ( atual && atual->valor != valor )
+	{
+		if ( valor > atual->valor )
+			atual = atual->dir;
+		else
+			atual = atual->esq;
+	}
+
+	return atual;
+}
+*/
