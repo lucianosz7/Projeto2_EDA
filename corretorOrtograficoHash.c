@@ -13,7 +13,7 @@
 
 /* Tamanho maximo de uma palavra do dicionario */
 #define TAM_MAX 45
-#define MAX 1000000000
+#define MAX 100000000
 /* dicionario default */
 #define NOME_DICIONARIO "dicio"
 

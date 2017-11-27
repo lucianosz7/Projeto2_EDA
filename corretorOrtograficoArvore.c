@@ -28,132 +28,148 @@ int top=0;
 #define ARQTEXTO_ERROLEITURA    4
 #define ERRO_DICIO_NAOCARREGADO 5
 
-struct avl_node_s {
-	struct avl_node_s *left;
-	struct avl_node_s *right;
-	char value[MAX];
+struct Node
+{
+    char palavra[TAM_MAX];
+    struct Node *left;
+    struct Node *right;
+    int height;
 };
 
-typedef struct avl_node_s avl_node_t;
+// A utility function to get maximum of two integers
+int max(int a, int b);
 
-struct avl_tree_s {
-	struct avl_node_s *root;
-};
-
-typedef struct avl_tree_s avl_tree_t;
-
-
-/* Create a new AVL tree. */
-avl_tree_t *avl_create() {
-	avl_tree_t *tree = NULL;
-
-	if( ( tree = malloc( sizeof( avl_tree_t ) ) ) == NULL ) {
-		return NULL;
-	}
-
-	tree->root = NULL;
-
-	return tree;
+// A utility function to get height of the tree
+int height(struct Node *N)
+{
+    if (N == NULL)
+        return 0;
+    return N->height;
 }
 
-/* Initialize a new node. */
-avl_node_t *avl_create_node() {
-	avl_node_t *node = NULL;
-
-	if( ( node = malloc( sizeof( avl_node_t ) ) ) == NULL ) {
-		return NULL;
-	}
-
-	node->left = NULL;
-	node->right = NULL;
-	strcpy(node->value," ");
-
-	return node;
+// A utility function to get maximum of two integers
+int max(int a, int b)
+{
+    return (a > b)? a : b;
 }
 
-/* Insert a new node. */
-void avl_insert( avl_tree_t *tree,char *palavra) {
-	avl_node_t *node = NULL;
-	avl_node_t *next = NULL;
-	avl_node_t *last = NULL;
-
-	/* Well, there must be a first case */
-	if( tree->root == NULL ) {
-		node = avl_create_node();
-		strcpy(node->value,palavra);
-
-		tree->root = node;
-
-	/* Okay.  We have a root already.  Where do we put this? */
-	} else {
-		next = tree->root;
-		last = NULL;
-
-		while( next != NULL ) {
-			last = next;
-			if(strcmp(palavra,next->value) < 0) {
-				next = next->left;
-
-			} else if(strcmp(palavra,next->value) > 0) {
-				next = next->right;
-			/* Have we already inserted this node? */
-    } else if(strcmp(palavra,next->value) == 0) {
-				/* This shouldn't happen. */
-			}
-		}
-
-		node = avl_create_node();
-		strcpy(node->value,palavra);
-
-		if( strcmp(palavra,last->value) < 0 ) last->left = node;
-		if( strcmp(palavra,last->value) > 0 ) last->right = node;
-	}
-
+/* Helper function that allocates a new node with the given key and
+    NULL left and right pointers. */
+struct Node* newNode(char *palavra)
+{
+    struct Node* node = (struct Node*)
+                        malloc(sizeof(struct Node));
+    strcpy(node->palavra,palavra);
+    node->left   = NULL;
+    node->right  = NULL;
+    node->height = 1;  // new node is initially added at leaf
+    return(node);
 }
 
-/* Find the height of an AVL node recursively */
-int avl_node_height( avl_node_t *node ) {
-	int height_left = 0;
-	int height_right = 0;
+// A utility function to right rotate subtree rooted with y
+// See the diagram given above.
+struct Node *rightRotate(struct Node *y)
+{
+    struct Node *x = y->left;
+    struct Node *T2 = x->right;
 
-	if( node->left ) height_left = avl_node_height( node->left );
-	if( node->right ) height_right = avl_node_height( node->right );
+    // Perform rotation
+    x->right = y;
+    y->left = T2;
 
-	return height_right > height_left ? ++height_right : ++height_left;
+    // Update heights
+    y->height = max(height(y->left), height(y->right))+1;
+    x->height = max(height(x->left), height(x->right))+1;
+
+    // Return new root
+    return x;
 }
 
-/* Find the balance of an AVL node */
-int avl_node_balance( avl_node_t *node ) {
-	int balance = 0;
-	if( node->left  ) balance += avl_node_height( node->left );
-	if( node->right ) balance -= avl_node_height( node->right );
+// A utility function to left rotate subtree rooted with x
+// See the diagram given above.
+struct Node *leftRotate(struct Node *x)
+{
+    struct Node *y = x->right;
+    struct Node *T2 = y->left;
 
-	return balance;
+    // Perform rotation
+    y->left = x;
+    x->right = T2;
+
+    //  Update heights
+    x->height = max(height(x->left), height(x->right))+1;
+    y->height = max(height(y->left), height(y->right))+1;
+
+    // Return new root
+    return y;
 }
 
-/* Do a depth first traverse of a node. */
-void avl_traverse_node_dfs( avl_node_t *node, int depth ) {
-	int i = 0;
-
-	if( node->left ) avl_traverse_node_dfs( node->left, depth + 2 );
-
-	for( i = 0; i < depth; i++ ) putchar( ' ' );
-	printf( "%s: %d\n", node->value, avl_node_balance( node ) );
-
-	if( node->right ) avl_traverse_node_dfs( node->right, depth + 2 );
+// Get Balance factor of node N
+int getBalance(struct Node *N)
+{
+    if (N == NULL)
+        return 0;
+    return height(N->left) - height(N->right);
 }
 
-/* Do a depth first traverse of a tree. */
-void avl_traverse_dfs( avl_tree_t *tree ) {
+// Recursive function to insert key in subtree rooted
+// with node and returns new root of subtree.
+struct Node* insert(struct Node* node, char *palavra)
+{
+    /* 1.  Perform the normal BST insertion */
+    if (node == NULL)
+        return(newNode(palavra));
 
-	avl_traverse_node_dfs( tree->root, 0 );
+    if (strcmp(palavra, node->palavra) < 0)
+        node->left  = insert(node->left, palavra);
+    else if (strcmp(palavra, node->palavra) > 0)
+        node->right = insert(node->right, palavra);
+    else // Equal keys are not allowed in BST
+        return node;
+
+    /* 2. Update height of this ancestor node */
+    node->height = 1 + max(height(node->left),
+                           height(node->right));
+
+    /* 3. Get the balance factor of this ancestor
+          node to check whether this node became
+          unbalanced */
+    int balance = getBalance(node);
+
+    // If this node becomes unbalanced, then
+    // there are 4 cases
+
+    // Left Left Case
+    if (balance > 1 && strcmp(palavra, node->left->palavra) < 0)
+        return rightRotate(node);
+
+    // Right Right Case
+    if (balance < -1 && strcmp(palavra, node->right->palavra) > 0)
+        return leftRotate(node);
+
+    // Left Right Case
+    if (balance > 1 && strcmp(palavra, node->left->palavra) > 0)
+    {
+        node->left =  leftRotate(node->left);
+        return rightRotate(node);
+    }
+
+    // Right Left Case
+    if (balance < -1 && strcmp(palavra, node->right->palavra) < 0)
+    {
+        node->right = rightRotate(node->right);
+        return leftRotate(node);
+    }
+
+    /* return the (unchanged) node pointer */
+    return node;
 }
 
-int tem_nada(avl_node_t *t){
+int tem_nada(struct Node *t){
   return t==NULL;
 }
 
-avl_node_t *motosserra(avl_node_t *no){
+struct Node *motosserra(struct Node *no){
   if(!tem_nada(no)){
     motosserra(no->left);
     motosserra(no->right);
@@ -162,34 +178,19 @@ avl_node_t *motosserra(avl_node_t *no){
   return NULL;
 }
 
-bool encontrar_valor (avl_tree_t* no, char *palavra )
-{
-	avl_node_t * atual = no->root;
 
-	while ( atual )
-	{
-		if ( strcmp(atual->value,palavra) < 0 )
-			atual = atual->right;
-		else if(strcmp(atual->value,palavra) > 0 )
-			atual = atual->left;
-		else
-			return true;
-	}
 
-	return false;
-}
-
-avl_tree_t *arvore = NULL;
+struct Node *arvore = NULL;
 
 /* Retorna true se a palavra estah no dicionario. Do contrario, retorna false */
 bool conferePalavra(const char *palavra) {
-    avl_node_t * atual = arvore->root;
+    struct Node * atual = arvore;
 
 	while ( atual )
 	{
-		if ( strcmp(atual->value,palavra) < 0 )
+		if ( strcmp(atual->palavra,palavra) < 0 )
 			atual = atual->right;
-		else if(strcmp(atual->value,palavra) > 0 )
+		else if(strcmp(atual->palavra,palavra) > 0 )
 			atual = atual->left;
 		else
 			return true;
@@ -227,13 +228,7 @@ bool carregaDicionario(const char *dicionario) {
         /* encontra uma palavra completa */
         else if (indice > 0) { /* termina a palavra corrente */
             palavra[indice] = '\0';
-		if(arvore == NULL){
-			arvore = avl_create();
-			avl_insert(arvore, palavra);
-		}
-		else{
-            		avl_insert(arvore, palavra);
-		}
+						arvore = insert(arvore,palavra);
             top++;
             i++;
             indice = 0;
@@ -261,9 +256,7 @@ unsigned int contaPalavrasDic(void) {
 
 /* Descarrega dicionario da memoria. Retorna true se ok e false se algo deu errado */
 bool descarregaDicionario(void) {
- 	avl_node_t *no;
-	no = arvore->root;
-	no = motosserra(no);
+	arvore = motosserra(arvore);
     	return true;
 } /* fim-descarregaDicionario */
 
