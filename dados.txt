@@ -1,0 +1,57 @@
+Velocidade
+
+-alice.txt (29758 palavras)
+
+AVL: 0.12 seg
+Hash: 0.04 seg
+
+-christmas.txt(31927 palavras)
+
+AVL: 0.13 seg
+Hash: 0.05 seg
+
+-constitution.txt(7573 palavras)
+
+AVL: 0.10 seg
+Hash: 0.04 seg
+
+-dracula.txt(163834 palavras)
+
+AVL: 0.22 seg
+Hash: 0.09 seg
+
+-holmes.txt (1150970 palavras)
+
+AVL: 0.95 seg
+Hash: 0.44 seg
+
+-huck.txt (115244 palavras)
+
+AVL: 0.16 seg
+Hash: 0.07 seg
+
+-men.txt (298 palavras)
+
+AVL: 0.10 seg
+Hash: 0.03 seg
+
+-prince.txt (52538 palavras)
+
+AVL: 0.15 seg
+Hash: 0.05 seg
+
+
+Colisões do código de hash
+
+alice.txt: 2 colisões
+christmas.txt: 7 colisões
+constitution.txt: 2 colisões
+dracula.txt: 43 colisões
+holmes.txt: 829 colisões
+huck.txt: 97 colisões
+men.txt: sem colisões
+prince.txt: 18 colisões
+
+
+
+

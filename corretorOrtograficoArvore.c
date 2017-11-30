@@ -299,6 +299,7 @@ int main(int argc, char *argv[]) {
     for (c = fgetc(fd); c != EOF; c = fgetc(fd)) {
         /* permite apenas palavras c/ caracteres alfabeticos e apostrofes */
         if (isalpha(c) || (c == '\'' && indice > 0)) {
+            c = tolower(c);
             /* recupera um caracter do arquivo e coloca no vetor palavra */
             palavra[indice] = c;
             indice++;
